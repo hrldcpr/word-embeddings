@@ -22,7 +22,13 @@ def get_nearest(v, N=10):
             heapq.heappushpop(nearest, (nearness, word))
     return sorted(nearest, reverse=True)
 
-river_bank = vectors['river'] + vectors['bank']
+def print_nearest(phrase, v=None):
+    if v is None: v = sum(vectors[w] for w in phrase.split())
+    print(phrase, np.linalg.norm(v))
+    for nearness, word in get_nearest(v):
+        print(word, nearness)
 
-for nearness, word in get_nearest(river_bank):
-    print(word, nearness)
+print_nearest('bank')
+print_nearest('river bank')
+print_nearest('queen - woman + man', vectors['queen'] - vectors['woman'] + vectors['man'])
+print_nearest('kitten - cat + dog', vectors['kitten'] - vectors['cat'] + vectors['dog'])
