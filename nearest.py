@@ -1,5 +1,4 @@
 import heapq
-import itertools
 
 import numpy as np
 from scipy.spatial.distance import cosine
@@ -46,18 +45,22 @@ def get_nearest(vectors, v, N=10):
             heapq.heappushpop(nearest, (nearness, word))
     return sorted(nearest, reverse=True)
 
-def print_nearest(vectors, phrase, v=None):
-    if v is None: v = sum(vectors[w] for w in phrase.split())
+def print_nearest(vectors, phrase):
+    K = len(next(iter(vectors.values())))
+    v = np.zeros(K)
+    for word in phrase.split():
+        if word.startswith('-'): v -= vectors[word[1:]]
+        else: v += vectors[word]
+
     print(phrase, np.linalg.norm(v))
     for nearness, word in get_nearest(vectors, v):
         print(word, nearness)
 
 def main():
-    vs = load_glo_ve()
-    print_nearest(vs, 'bank')
-    print_nearest(vs, 'river bank')
-    print_nearest(vs, 'queen - woman + man', vs['queen'] - vs['woman'] + vs['man'])
-    print_nearest(vs, 'kitten - cat + dog', vs['kitten'] - vs['cat'] + vs['dog'])
+    vs = load_glo_ve(50)
+    print_nearest(vs, 'king')
+    print_nearest(vs, 'woman')
+    print_nearest(vs, 'king -man woman')
 
 if __name__ == '__main__':
     main()
